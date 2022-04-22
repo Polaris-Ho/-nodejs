@@ -1,21 +1,15 @@
 var http = require('http');
 var fs = require('fs');
-var url = require('url');//url은 모듈 url을 가르킨다.
+var url = require('url');
 
 var app = http.createServer(function(request,response){
     var _url = request.url;
     var queryData = url.parse(_url, true).query;
+    var pathname = url.parse(_url, true).pathname;
     var title = queryData.id;
-    if(_url == '/'){
-        title ='Welcome!';
-    }
-    if(_url == '/favicon.ico'){
-        response.writeHead(404);
-        response.end();
-        return;
-    }
-    response.writeHead(200);
-    fs.readFile(`data/${queryData.id}`,'utf-8',function(err, description){
+    
+    if(pathname === '/'){
+        fs.readFile(`data/${queryData.id}`,'utf-8',function(err, description){
         var template = `
         <!doctype html>
         <html>
@@ -36,7 +30,13 @@ var app = http.createServer(function(request,response){
         </body>
         </html>
         `;
+    response.writeHead(200);
     response.end(template);
     })
+}else{
+    response.writeHead(404);
+    response.end('Not found');
+}
+
 });
 app.listen(3000);
